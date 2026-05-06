@@ -24,46 +24,67 @@ export default function AdminPage() {
     };
 
     return (
-        <div style={{ padding: "2rem", fontFamily: "monospace" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1.5rem" }}>
-                <h1 style={{ fontSize: "1.5rem", fontWeight: 700 }}>QR Codes</h1>
+        <div className="px-6 py-8 font-sans">
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-lg font-medium text-gray-900">QR codes</h1>
                 <Link href="/admin/create">
-                    <button style={btnStyle("#000")}>+ New QR</button>
+                    <button className="text-[13px] font-medium px-3.5 py-1.5 rounded-lg bg-gray-900 text-white hover:bg-gray-700 transition-colors">
+                        + New QR
+                    </button>
                 </Link>
             </div>
 
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table className="w-full border-collapse text-[13px]" style={{ tableLayout: "fixed" }}>
+                <colgroup>
+                    <col style={{ width: "16%" }} />
+                    <col style={{ width: "14%" }} />
+                    <col style={{ width: "28%" }} />
+                    <col style={{ width: "9%" }} />
+                    <col style={{ width: "12%" }} />
+                    <col style={{ width: "21%" }} />
+                </colgroup>
                 <thead>
-                    <tr style={{ borderBottom: "2px solid #000" }}>
+                    <tr className="border-b border-gray-100">
                         {["Label", "Slug", "Destination", "Scans", "Status", "Actions"].map((h) => (
-                            <th key={h} style={{ textAlign: "left", padding: "0.5rem" }}>{h}</th>
+                            <th key={h} className="text-left px-3 pb-2.5 text-[11px] font-medium text-gray-400 tracking-wider uppercase">
+                                {h}
+                            </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
                     {codes.map((c) => (
-                        <tr key={c._id} style={{ borderBottom: "1px solid #ddd" }}>
-                            <td style={{ padding: "0.75rem" }}>{c.label}</td>
-                            <td style={{ padding: "0.75rem", color: "#555" }}>{c.slug}</td>
-                            <td style={{ padding: "0.75rem", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis" }}>
-                                {c.destinationUrl}
-                            </td>
-                            <td style={{ padding: "0.75rem", fontWeight: 700 }}>{c.scanCount}</td>
-                            <td style={{ padding: "0.75rem" }}>
-                                <span style={{ color: c.active ? "green" : "red" }}>
+                        <tr key={c._id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                            <td className="px-3 py-3.5 font-medium truncate">{c.label}</td>
+                            <td className="px-3 py-3.5 font-mono text-[12px] text-gray-500 truncate">{c.slug}</td>
+                            <td className="px-3 py-3.5 text-[12px] text-gray-500 truncate">{c.destinationUrl}</td>
+                            <td className="px-3 py-3.5 font-medium tabular-nums">{c.scanCount.toLocaleString()}</td>
+                            <td className="px-3 py-3.5">
+                                <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full ${c.active
+                                        ? "bg-green-50 text-green-700"
+                                        : "bg-gray-100 text-gray-500"
+                                    }`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${c.active ? "bg-green-500" : "bg-gray-400"}`} />
                                     {c.active ? "Active" : "Inactive"}
                                 </span>
                             </td>
-                            <td style={{ padding: "0.75rem", display: "flex", gap: "0.5rem" }}>
-                                <Link href={`/admin/${c._id}`}>
-                                    <button style={btnStyle("#444", "0.7rem")}>Stats</button>
-                                </Link>
-                                <button
-                                    onClick={() => toggle(c._id, c.active)}
-                                    style={btnStyle(c.active ? "#c00" : "#090", "0.7rem")}
-                                >
-                                    {c.active ? "Disable" : "Enable"}
-                                </button>
+                            <td className="px-3 py-3.5">
+                                <div className="flex gap-1.5">
+                                    <Link href={`/admin/${c._id}`}>
+                                        <button className="text-[12px] font-medium px-3 py-1 rounded-md border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                                            Stats
+                                        </button>
+                                    </Link>
+                                    <button
+                                        onClick={() => toggle(c._id, c.active)}
+                                        className={`text-[12px] font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80 ${c.active
+                                                ? "bg-red-50 text-red-700"
+                                                : "bg-green-50 text-green-700"
+                                            }`}
+                                    >
+                                        {c.active ? "Disable" : "Enable"}
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
@@ -72,13 +93,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-const btnStyle = (bg: string, fontSize = "0.9rem") => ({
-    background: bg,
-    color: "#fff",
-    border: "none",
-    padding: "0.4rem 0.9rem",
-    cursor: "pointer",
-    fontSize,
-    borderRadius: 4,
-});
