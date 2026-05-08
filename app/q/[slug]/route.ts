@@ -24,5 +24,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
         }
     })();
 
-    return NextResponse.redirect(doc.destinationUrl, 302);
+    const destination = /^https?:\/\//i.test(doc.destinationUrl)
+        ? doc.destinationUrl
+        : `https://${doc.destinationUrl}`;
+
+    return NextResponse.redirect(destination, 302);
 }
