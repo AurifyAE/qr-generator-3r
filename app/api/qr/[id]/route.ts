@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import QRCode from "@/models/QRCode";
+import Scan from "@/models/Scan";
 import { generateQRDataURL } from "@/lib/qrgen";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -25,6 +26,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     await connectDB();
     const { id } = await params;
-    await QRCode.findByIdAndUpdate(id, { active: false });
+    const deleted = await QRCode.findByIdAndDelete(id);
+    if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await Scan.deleteMany({ qrId: id });
     return NextResponse.json({ success: true });
 }
