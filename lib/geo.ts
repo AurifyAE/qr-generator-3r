@@ -59,15 +59,23 @@ export async function parseRequest(req: Request) {
     let country = "Unknown";
     let city = "Unknown";
 
-    if (ip !== "unknown") {
+    // 1. Prefer Vercel's built-in geo headers (free, instant, accurate)
+    const vercelCountry = req.headers.get("x-vercel-ip-country");
+    const vercelCity = req.headers.get("x-vercel-ip-city");
+
+    if (vercelCountry) {
+        country = vercelCountry;
+        city = vercelCity ? decodeURIComponent(vercelCity) : "Unknown";
+    } else if (ip !== "unknown" && !isPrivateOrLocalIp(ip)) {
+        // 2. Fallback: external geo API for non-Vercel environments
         try {
             const res = await fetch(
-                `https://ipwho.is/${encodeURIComponent(ip)}?fields=success,country,city`,
-                { signal: AbortSignal.timeout(2000) }
+                `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,country,city`,
+                { signal: AbortSignal.timeout(3000) }
             );
             if (res.ok) {
                 const geo = await res.json();
-                if (geo.success) {
+                if (geo.status === "success") {
                     country = geo.country ?? "Unknown";
                     city = geo.city ?? "Unknown";
                 }

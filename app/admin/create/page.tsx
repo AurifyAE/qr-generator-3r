@@ -53,63 +53,12 @@ export default function CreatePage() {
 
     const downloadPDF = () => {
         if (!result) return;
-        const scanUrl = result.qrUrl;
         const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
-        // Page background
-        pdf.setFillColor(248, 250, 252);
-        pdf.rect(0, 0, 210, 297, "F");
-
-        // Title + subtitle
-        pdf.setTextColor(15, 23, 42);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(22);
-        pdf.text("QR Code Card", 20, 24);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(71, 85, 105);
-        pdf.setFontSize(11);
-        pdf.text("Scan to open the destination instantly", 20, 31);
-
-        // Header accent bar
-        pdf.setFillColor(15, 23, 42);
-        pdf.roundedRect(20, 38, 170, 6, 2, 2, "F");
-
-        // Main card
-        pdf.setFillColor(255, 255, 255);
-        pdf.setDrawColor(226, 232, 240);
-        pdf.roundedRect(20, 50, 170, 175, 4, 4, "FD");
-
-        // QR image
-        pdf.addImage(result.qrImage, "PNG", 35, 66, 60, 60);
-
-        // Label and slug
-        pdf.setTextColor(15, 23, 42);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(14);
-        pdf.text(result.label || "Untitled QR", 105, 77);
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
-        pdf.setTextColor(100, 116, 139);
-        pdf.text(`/${result.slug}`, 105, 84);
-
-        // Destination block
-        pdf.setFillColor(248, 250, 252);
-        pdf.roundedRect(35, 138, 140, 38, 3, 3, "F");
-        pdf.setFont("helvetica", "bold");
-        pdf.setTextColor(51, 65, 85);
-        pdf.setFontSize(10);
-        pdf.text("Scan URL", 41, 148);
-        pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(71, 85, 105);
-        pdf.setFontSize(9);
-        const wrappedScanUrl = pdf.splitTextToSize(scanUrl, 130);
-        pdf.text(wrappedScanUrl, 41, 156);
-
-        // Footer meta
-        pdf.setFontSize(9);
-        pdf.setTextColor(148, 163, 184);
-        pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 245);
-        pdf.text("Powered by 3R QR", 190, 245, { align: "right" });
+        // Full-width QR image, actual square aspect ratio, centered vertically
+        const size = 210;
+        const y = (297 - size) / 2;
+        pdf.addImage(result.qrImage, "PNG", 0, y, size, size);
 
         pdf.save(`${result.slug}.pdf`);
     };
