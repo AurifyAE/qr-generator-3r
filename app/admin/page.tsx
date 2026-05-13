@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function AdminPage() {
     const [codes, setCodes] = useState<any[]>([]);
@@ -25,14 +26,39 @@ export default function AdminPage() {
     };
 
     const remove = async (id: string) => {
-        const confirmed = window.confirm("Delete this QR code permanently?");
+        const confirmed = await new Promise<boolean>((resolve) => {
+            toast(
+                (t) => (
+                    <div className="flex flex-col gap-2">
+                        <p className="text-sm font-medium">Delete this QR code permanently?</p>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => { toast.dismiss(t.id); resolve(true); }}
+                                className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                            >
+                                Delete
+                            </button>
+                            <button
+                                onClick={() => { toast.dismiss(t.id); resolve(false); }}
+                                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                ),
+                { duration: 5000 }
+            );
+        });
+
         if (!confirmed) return;
         const res = await fetch(`/api/qr/${id}`, { method: "DELETE" });
         if (!res.ok) {
-            window.alert("Failed to delete QR code.");
+            toast.error("Failed to delete QR code.");
             return;
         }
         setCodes((prev) => prev.filter((c) => c._id !== id));
+        toast.success("QR code deleted successfully.");
     };
 
     const filteredCodes = codes.filter((c) => {
@@ -92,8 +118,8 @@ export default function AdminPage() {
                             <td className="px-3 py-3.5 font-medium tabular-nums">{c.scanCount.toLocaleString()}</td>
                             <td className="px-3 py-3.5">
                                 <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full ${c.active
-                                        ? "bg-emerald-50 text-emerald-700"
-                                        : "bg-slate-100 text-slate-500"
+                                    ? "bg-emerald-50 text-emerald-700"
+                                    : "bg-slate-100 text-slate-500"
                                     }`}>
                                     <span className={`w-1.5 h-1.5 rounded-full ${c.active ? "bg-emerald-500" : "bg-slate-400"}`} />
                                     {c.active ? "Active" : "Inactive"}
@@ -109,8 +135,8 @@ export default function AdminPage() {
                                     <button
                                         onClick={() => toggle(c._id, c.active)}
                                         className={`text-[12px] font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80 ${c.active
-                                                ? "bg-rose-50 text-rose-700"
-                                                : "bg-emerald-50 text-emerald-700"
+                                            ? "bg-rose-50 text-rose-700"
+                                            : "bg-emerald-50 text-emerald-700"
                                             }`}
                                     >
                                         {c.active ? "Disable" : "Enable"}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 import { jsPDF } from "jspdf";
+import toast from "react-hot-toast";
 
 type CreateQRResult = {
     label: string;
@@ -27,8 +28,16 @@ export default function CreatePage() {
             body: JSON.stringify({ label, destinationUrl: url }),
         });
         const data = await res.json();
+
+        if (!res.ok) {
+            toast.error(data.error || "Failed to create QR code.");
+            setLoading(false);
+            return;
+        }
+
         setResult(data);
         setLoading(false);
+        toast.success("QR code created successfully!");
     };
 
     const downloadPNG = () => {
@@ -37,6 +46,7 @@ export default function CreatePage() {
         a.href = result.qrImage;
         a.download = `${result.slug}.png`;
         a.click();
+        toast.success("PNG downloaded successfully!");
     };
 
     const downloadSVG = async () => {
@@ -49,6 +59,7 @@ export default function CreatePage() {
         a.download = `${result.slug}.svg`;
         a.click();
         URL.revokeObjectURL(href);
+        toast.success("SVG downloaded successfully!");
     };
 
     const downloadPDF = () => {
@@ -61,6 +72,7 @@ export default function CreatePage() {
         pdf.addImage(result.qrImage, "PNG", 0, y, size, size);
 
         pdf.save(`${result.slug}.pdf`);
+        toast.success("PDF downloaded successfully!");
     };
 
     return (
