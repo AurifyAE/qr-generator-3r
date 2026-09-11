@@ -3,8 +3,13 @@ import { connectDB } from "@/lib/db";
 import { generateQRDataURL } from "@/lib/qrgen";
 import QRCode from "@/models/QRCode";
 import { nanoid } from "nanoid";
+import { isAdminAuthenticated } from "@/lib/auth";
 
 export async function GET() {
+    if (!(await isAdminAuthenticated())) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     try {
         await connectDB();
         const codes = await QRCode.find().sort({ createdAt: -1 });
@@ -16,6 +21,10 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+    if (!(await isAdminAuthenticated())) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     try {
         await connectDB();
         const { label, destinationUrl } = await req.json();

@@ -7,6 +7,11 @@ export default function AdminPage() {
     const [codes, setCodes] = useState<any[]>([]);
     const [search, setSearch] = useState("");
 
+    const logout = async () => {
+        await fetch("/api/auth/logout", { method: "POST" });
+        window.location.assign("/login");
+    };
+
     useEffect(() => {
         fetch("/api/qr")
             .then((r) => r.json())
@@ -75,11 +80,19 @@ export default function AdminPage() {
         <div className="px-6 py-8 font-sans text-slate-900">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-lg font-medium">QR codes</h1>
-                <Link href="/admin/create">
-                    <button className="text-[13px] font-medium px-3.5 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-700 transition-colors">
-                        + New QR
+                <div className="flex items-center gap-2">
+                    <Link href="/admin/create">
+                        <button className="text-[13px] font-medium px-3.5 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-700 transition-colors">
+                            + New QR
+                        </button>
+                    </Link>
+                    <button
+                        onClick={logout}
+                        className="text-[13px] font-medium px-3.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                    >
+                        Sign out
                     </button>
-                </Link>
+                </div>
             </div>
 
             <div className="mb-5">
